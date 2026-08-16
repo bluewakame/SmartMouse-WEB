@@ -34,7 +34,12 @@ export default function App() {
   const snapshot = useSyncExternalStore(client.subscribe, client.getSnapshot);
 
   const [receiverAddress, setReceiverAddress] = useStoredState("receiverAddress", "");
-  const [preferences, setPreferences] = useStoredState("preferences", DEFAULT_PREFERENCES);
+  const [storedPreferences, setPreferences] = useStoredState("preferences", DEFAULT_PREFERENCES);
+  // 設定項目が増えたあとでも、古い保存内容で undefined にならないようにする。
+  const preferences = useMemo(
+    () => ({ ...DEFAULT_PREFERENCES, ...storedPreferences }),
+    [storedPreferences],
+  );
   const [inputText, setInputText] = useState("");
   const [dragLocked, setDragLocked] = useState(false);
   const [showingSettings, setShowingSettings] = useState(false);
@@ -118,14 +123,13 @@ export default function App() {
     };
   }, [connected]);
 
-  // タブを閉じる直前に押しっぱなしを解除する。
+  // タブを閉じる直前に押しっぱなしを解除して、Windows側にボタン押下を残さない。
+  // 接続はページと同じ寿命なので、ここでは切断しない
+  // （StrictModeの二重マウントで、繋いだ直後に切れてしまうため）。
   useEffect(() => {
     const release = () => client.sendReleaseAll();
     window.addEventListener("pagehide", release);
-    return () => {
-      window.removeEventListener("pagehide", release);
-      client.disconnect();
-    };
+    return () => window.removeEventListener("pagehide", release);
   }, [client]);
 
   const accelerated = useCallback(
