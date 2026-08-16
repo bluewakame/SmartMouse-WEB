@@ -1,26 +1,43 @@
 # SmartMouse Web
 
 スマホのブラウザから Windows PC のマウス・キーボードを操作する Web アプリです。
-iOS 版 SmartMouse（SwiftUI）の画面と操作をそのまま移植したもので、
-**Windows 側の Receiver は一切変更していません**。既存の `SmartMouseReceiver.exe` にそのまま繋がります。
+iOS 版 SmartMouse（SwiftUI）の画面と操作をそのまま移植しています。
 
 - 画面構成・配色・ジェスチャは iOS 版 `ContentView.swift` / `TrackpadView.swift` に合わせてあります
-- 通信仕様は `WindowsReceiver/receiver_protocol.py`（プロトコル `2`）と同じです
+- 通信仕様は Receiver の `receiver_protocol.py`（プロトコル `2`）と同じです
 - QRコードの読み取り、合言葉切れの検知、自動再接続も iOS 版と同じ流れです
 
 ---
 
-## 重要：ページは必ず `http://` で開く
+## 使う人向け：ビルドは不要です
+
+**Receiver v0.5.0 以降は、このアプリがビルド済みで `SmartMouseReceiver.exe` に同梱されています。**
+Receiver が 8000 番の `/` で配信するので、利用者側でこのリポジトリを触る必要はありません。
+
+1. [SmartMouse の Releases](https://github.com/bluewakame/SmartMouse/releases) から ZIP を落として展開
+2. `SmartMouseReceiver.exe` を起動
+3. 画面の QR コードをスマホの標準カメラで読む → ブラウザが開いて接続完了
+
+このリポジトリを直接使うのは、**アプリを開発・改造する場合**か、Receiver v0.4.x など
+同梱前のバージョンに繋ぐ場合だけです。以降はその手順です。
+
+---
+
+## 制約：ページは `http://` で配信する
 
 Receiver は `ws://`（暗号化なし）で待ち受けています。ブラウザは **HTTPS のページから `ws://` への接続を必ず遮断する**ため、
-このアプリを GitHub Pages などの HTTPS で配信すると接続できません。**同じ LAN 内の PC から `http://` で配信してください。**
+GitHub Pages などの HTTPS で配信すると接続できません。**同じ LAN 内の PC から `http://` で配信してください。**
+
+> Receiver に同梱して配信する場合は、ページと WebSocket が同じオリジン（`http://<PCのIP>:8000`）になるため、
+> この問題は起きません。単独で配信するときだけ気にすれば十分です。
 
 この制約の副作用として、`http://` のページではブラウザがカメラ映像（`getUserMedia`）を許可しません。
-そのため QR コードの読み取りは次の 3 通りを用意しています。
+そのため QR コードの読み取りは次の方法を用意しています。
 
 | 方法 | `http://` 配信時 | 備考 |
 | --- | --- | --- |
-| **`npm run pair` のQRを標準カメラで読む** | ✅ 使える | ブラウザが開いて接続まで自動。いちばん手軽 |
+| **Receiver の QR を標準カメラで読む** | ✅ 使える | v0.5.0 以降。ブラウザが開いて接続まで自動 |
+| **`npm run pair` のQRを標準カメラで読む** | ✅ 使える | 単独配信時に、同じ体験を作るためのコマンド |
 | **アプリ内でQRコードを撮影して読み取る** | ✅ 使える | カメラアプリで1枚撮る方式 |
 | カメラ映像でリアルタイム読み取り | ❌ 使えない | `https://` か `localhost` で開いたときだけ自動的に有効 |
 | 手入力（`ws://…?token=…` または合言葉32桁） | ✅ 使える | QR が読めないときの予備手段 |
@@ -29,7 +46,7 @@ PC のスクリーンショットを選んでも読み取れるので、Receiver
 
 ---
 
-## 使いかた
+## 単独で配信して使う（開発時・v0.4.x 向け）
 
 ### 1. ビルドして配信する（Receiver と同じ PC で）
 
@@ -110,6 +127,15 @@ npm run build      # 型チェック + 本番ビルド
 受け取ったメッセージを標準出力に流します（実際のマウスは動きません）。
 `localhost` は安全なコンテキスト扱いなので、開発中はカメラ映像での QR 読み取りも試せます。
 
+### Receiver へ同梱する
+
+ビルド結果を Receiver 側の `WindowsReceiver/web/` へ入れると、次回の exe ビルドで同梱されます。
+
+```powershell
+npm ci; npm run build
+robocopy dist ..\SmartMouse\WindowsReceiver\web /MIR
+```
+
 ### 構成
 
 ```
@@ -132,7 +158,7 @@ serve.py                    LAN配信用の簡易HTTPサーバー
 
 | 項目 | iOS 版 | Web 版 |
 | --- | --- | --- |
-| QR 読み取り | カメラでリアルタイム | 撮影した写真から読み取り（`https`/`localhost` ならリアルタイムも可） |
+| QR 読み取り | カメラでリアルタイム | Receiver同梱時は標準カメラで開くだけ。アプリ内では撮影した写真から読み取り（`https`/`localhost` ならリアルタイムも可） |
 | Receiver の自動検出 | Bonjour で検出 | ブラウザから mDNS を引けないため非対応。QR か手入力で接続 |
 | 通信遅延の表示 | WebSocket の ping | `/health` への応答時間（ブラウザに ping API が無いため） |
 | 触覚フィードバック | Taptic Engine | 対応端末のみ振動（iOS Safari は非対応） |
