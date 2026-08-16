@@ -11,7 +11,8 @@
     "preview": "vite preview --host 0.0.0.0 --port 8080",
     "test": "vitest run",
     "test:watch": "vitest",
-    "mock": "node scripts/mock-receiver.mjs"
+    "mock": "node scripts/mock-receiver.mjs",
+    "pair": "node scripts/pair-qr.mjs"
   },
   "dependencies": {
     "jsqr": "^1.4.0",
@@ -22,7 +23,9 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
+    "bonjour-service": "^1.4.4",
     "jsdom": "^25.0.1",
+    "qrcode": "^1.5.4",
     "typescript": "^5.6.3",
     "vite": "^5.4.11",
     "vitest": "^2.1.8",

@@ -20,7 +20,8 @@ Receiver は `ws://`（暗号化なし）で待ち受けています。ブラウ
 
 | 方法 | `http://` 配信時 | 備考 |
 | --- | --- | --- |
-| **QRコードを撮影して読み取る** | ✅ 使える | カメラアプリで1枚撮る方式。実運用ではこれが基本 |
+| **`npm run pair` のQRを標準カメラで読む** | ✅ 使える | ブラウザが開いて接続まで自動。いちばん手軽 |
+| **アプリ内でQRコードを撮影して読み取る** | ✅ 使える | カメラアプリで1枚撮る方式 |
 | カメラ映像でリアルタイム読み取り | ❌ 使えない | `https://` か `localhost` で開いたときだけ自動的に有効 |
 | 手入力（`ws://…?token=…` または合言葉32桁） | ✅ 使える | QR が読めないときの予備手段 |
 
@@ -41,6 +42,22 @@ python serve.py          # http://<PCのIP>:8080/ で配信
 `serve.py` は起動時に LAN 側の URL を表示します。`SmartMouseReceiver.exe` も起動したままにしてください。
 
 ### 2. スマホから開く
+
+**おすすめ：標準のカメラで読むだけで繋ぐ**
+
+```bash
+npm run pair
+```
+
+Receiver が mDNS で公開している合言葉を拾って、**ブラウザ起動用の QR コード**を作ります。
+PC の画面に出た QR を iPhone / Android の標準カメラで読み取ると、ブラウザが開いてそのまま接続まで終わります。
+
+> Receiver 自身の QR は `ws://` で始まるため、標準のカメラアプリでは開けません（`ws:` を扱えるアプリが無いため）。
+> `npm run pair` はそれを `http://…#ws://…` に作り直しているだけで、Receiver 側は変更していません。
+> mDNS が届かない環境では、Receiver 画面のアドレスを渡してください:
+> `node scripts/pair-qr.mjs "ws://192.168.1.2:8000/ws?token=..."`
+
+**アプリの中で読み取る場合**
 
 1. スマホのブラウザで `http://<PCのIP>:8080/` を開く
 2. 2 秒待つと QR 読み取り画面が自動で開く
@@ -84,6 +101,7 @@ Receiver を再起動すると合言葉が変わるため、その時は自動�
 ```bash
 npm run dev        # 開発サーバー（http://localhost:5173）
 npm run mock       # Windows PC 無しで動かすための にせ Receiver
+npm run pair       # ブラウザ起動用のQRコードを作る
 npm test           # 通信仕様と接続処理のテスト
 npm run build      # 型チェック + 本番ビルド
 ```
@@ -104,6 +122,7 @@ src/
   components/QRScanner.tsx  QR読み取り画面
   components/SettingsSheet.tsx 設定画面
 scripts/mock-receiver.mjs   開発用のにせReceiver
+scripts/pair-qr.mjs         ブラウザ起動用QRの生成（mDNSで合言葉を取得）
 serve.py                    LAN配信用の簡易HTTPサーバー
 ```
 
