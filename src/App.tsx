@@ -295,6 +295,13 @@ export default function App() {
               <BackspaceIcon />
             </button>
           </div>
+          {/* パスワード入力の代行がこの機能のいちばん自然な使い道である一方、
+              ws:// は暗号化されない。入力欄のすぐ横で伝えないと意味がないので、
+              設定画面のセキュリティ欄と重複してでもここに置く。 */}
+          <p className="keyboard-panel__caution">
+            <span aria-hidden="true">🔓</span>
+            送信内容は暗号化されません。パスワードの入力には使わないでください。
+          </p>
         </div>
 
         <div className="gesture-card" aria-hidden="true">

@@ -176,6 +176,31 @@ export function SettingsSheet({
         </section>
 
         <section className="settings__section">
+          <h3>安全に使うために</h3>
+          <p className="settings__caution">
+            <span aria-hidden="true">🔓</span>
+            このアプリとPCの通信は暗号化されていません。
+          </p>
+          <ul className="settings__rules">
+            <li>
+              <strong>自宅など、信頼できるWi‑Fiでだけ使ってください。</strong>
+              社内・学校・カフェ・ホテル・寮などの共有Wi‑Fiでは、同じネットワークにいる第三者に通信を読み取られる可能性があります。
+            </li>
+            <li>
+              <strong>パスワードやクレジットカード番号は送らないでください。</strong>
+              「文字入力 → 送信」で送った内容はそのまま流れます。
+            </li>
+            <li>
+              <strong>使い終わったらReceiverを終了してください。</strong>
+              合言葉はReceiverを起動し直すたびに新しくなり、古い合言葉は使えなくなります。
+            </li>
+          </ul>
+          <p className="settings__hint">
+            合言葉を知っている端末は、PCのマウスとキーボードを自由に操作できます。QRコードを他人に見せたり、画面を共有したまま表示したりしないでください。
+          </p>
+        </section>
+
+        <section className="settings__section">
           <h3>ヘルプ</h3>
           <button type="button" className="button" onClick={() => setShowingHelp(!showingHelp)}>
             接続できないとき

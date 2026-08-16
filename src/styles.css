@@ -201,6 +201,16 @@ body {
   height: 42px;
 }
 
+.keyboard-panel__caution {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10.5px;
+  line-height: 1.35;
+  color: rgba(255, 214, 153, 0.85);
+}
+
 /* ボタン共通 */
 .button {
   flex: 1;
@@ -462,6 +472,32 @@ body {
   font-size: 12px;
   line-height: 1.5;
   color: rgba(255, 255, 255, 0.55);
+}
+
+.settings__caution {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 214, 153, 0.95);
+}
+
+.settings__rules {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 12px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.settings__rules strong {
+  display: block;
+  color: rgba(255, 255, 255, 0.92);
 }
 
 .settings__row {
