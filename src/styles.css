@@ -1,0 +1,610 @@
+/*
+ * 配色と余白は iOS版 ContentView.swift の値をそのまま換算している。
+ * accent  = Color(red: 0.20, green: 0.86, blue: 0.62)
+ * control = Color(red: 0.16, green: 0.17, blue: 0.18)
+ */
+:root {
+  --accent: #33db9e;
+  --control: #292b2e;
+  --background: #0b0d0e;
+  --rail: #1f2124;
+  --radius: 12px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --rail-width: 46px;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body {
+  background: var(--background);
+  color: #fff;
+  font-family:
+    ui-rounded, -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", system-ui,
+    sans-serif;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.app {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: linear-gradient(135deg, #181b1c, #131416);
+  transition: background 0.25s ease;
+}
+
+.app[data-drag-locked="true"] {
+  background: linear-gradient(135deg, #12291f, #0f1a17);
+}
+
+/* タッチ操作面はいちばん下の層に敷き、隙間からすべて拾えるようにする。 */
+.trackpad {
+  position: absolute;
+  inset: 0;
+  touch-action: none;
+  -webkit-touch-callout: none;
+}
+
+.overlay {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+  padding: calc(var(--safe-top) + 6px) calc(var(--rail-width) + 8px) calc(var(--safe-bottom) + 8px)
+    8px;
+  /* 隙間のタッチはトラックパッドへ通す。操作要素だけ個別に受け取る。 */
+  pointer-events: none;
+}
+
+.overlay button,
+.overlay input,
+.overlay label,
+.banner,
+.keyboard-panel,
+.action-buttons {
+  pointer-events: auto;
+}
+
+/* ヘッダー */
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.header__title {
+  min-width: 0;
+  flex: 1;
+}
+
+/* 端末幅や日本語フォントの字幅に関係なく、右の接続チップを押し出さない。 */
+.header__title h1 {
+  margin: 0;
+  font-size: clamp(20px, 6.5vw, 27px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.header__title p {
+  margin: 2px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.status-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.82);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+.status-chip__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff5a5a;
+}
+
+.status-chip__dot[data-connected="true"] {
+  background: var(--accent);
+}
+
+/* 接続できていないときの案内 */
+.banner {
+  border-radius: var(--radius);
+  background: rgba(0, 0, 0, 0.44);
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.banner__title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+}
+
+.banner__hint {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.banner__actions {
+  display: flex;
+  gap: 7px;
+}
+
+/* 文字入力 */
+.keyboard-panel {
+  border-radius: var(--radius);
+  background: rgba(0, 0, 0, 0.34);
+  padding: 4px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.keyboard-panel__field {
+  height: 44px;
+  border: 0;
+  border-radius: 10px;
+  padding: 0 12px;
+  background: #f7f7f7;
+  color: #000;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.keyboard-panel__field::placeholder {
+  color: #5c5c5c;
+}
+
+.keyboard-panel__buttons {
+  display: flex;
+  gap: 7px;
+  height: 42px;
+}
+
+/* ボタン共通 */
+.button {
+  flex: 1;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  border: 0;
+  border-radius: 10px;
+  padding: 0 10px;
+  background: var(--control);
+  color: #fff;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.button:disabled {
+  opacity: 0.45;
+}
+
+/* ボタンが狭くてもアイコンだけは潰さない。 */
+.button svg,
+.status-chip svg {
+  flex: 0 0 auto;
+}
+
+.button--primary {
+  background: var(--accent);
+  color: #000;
+}
+
+.button--danger {
+  color: #ff7b7b;
+}
+
+.button--compact {
+  flex: 0 0 58px;
+}
+
+.button--small {
+  height: 30px;
+  font-size: 12px;
+}
+
+/* 操作ヒント（タッチはトラックパッドへ通す） */
+.gesture-card {
+  flex: 1;
+  min-height: 0;
+  border-radius: 18px;
+  border: 1.5px solid rgba(51, 219, 158, 0.3);
+  background: linear-gradient(135deg, rgba(51, 219, 158, 0.2), rgba(51, 219, 158, 0.1));
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.app[data-drag-locked="true"] .gesture-card {
+  border-color: rgba(51, 219, 158, 0.55);
+  background: linear-gradient(135deg, rgba(51, 219, 158, 0.3), rgba(51, 219, 158, 0.18));
+}
+
+.gesture-card__head {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.gesture-card__icon {
+  display: flex;
+  padding-top: 2px;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.app[data-drag-locked="true"] .gesture-card__icon {
+  color: var(--accent);
+}
+
+.gesture-card__head strong {
+  display: block;
+  font-size: 17px;
+}
+
+.gesture-card__head span {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.35;
+}
+
+.gesture-card__hints {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.gesture-card__hints span {
+  padding: 7px 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.055);
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+/* 下段の操作ボタン */
+.action-buttons {
+  display: flex;
+  gap: 7px;
+  height: 44px;
+}
+
+.button--action {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius);
+  padding: 0 6px;
+  gap: 4px;
+  font-size: 13px;
+}
+
+.button--action[data-active="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #000;
+}
+
+/* スクロールバー */
+.rail-layer {
+  position: absolute;
+  top: calc(var(--safe-top) + 2px);
+  bottom: calc(var(--safe-bottom) + 2px);
+  right: 2px;
+  z-index: 2;
+  width: var(--rail-width);
+}
+
+.rail-layer[data-left="true"] {
+  right: auto;
+  left: 2px;
+}
+
+.scroll-rail {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  border-radius: var(--radius);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: var(--rail);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+}
+
+.scroll-rail__thumb {
+  width: 32px;
+  border-radius: 10px;
+  background: #fff;
+  color: rgba(0, 0, 0, 0.62);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* シート（設定・QR読み取り） */
+.sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background: #121315;
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--safe-top);
+  padding-bottom: var(--safe-bottom);
+}
+
+.sheet__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sheet__header h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.sheet__close {
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-weight: 700;
+  padding: 6px 4px;
+}
+
+.sheet__body,
+.scanner__body {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.settings__section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.settings__section h3 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.settings__section input[type="text"] {
+  height: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  font: inherit;
+  font-size: 15px;
+  padding: 0 12px;
+}
+
+.settings__section input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+.settings__status,
+.settings__value {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.settings__hint {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.settings__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0;
+  font-size: 14px;
+}
+
+.settings__row span:first-child {
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.settings__toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.settings__toggle input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--accent);
+}
+
+.help {
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.help li {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.help__number {
+  flex: 0 0 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #000;
+  font-weight: 700;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.help__detail {
+  display: block;
+  margin-top: 3px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* QR読み取り */
+.scanner__viewfinder {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  max-height: 46vh;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #000;
+}
+
+.scanner__viewfinder video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.scanner__frame {
+  position: absolute;
+  inset: 18%;
+  border: 3px solid var(--accent);
+  border-radius: 14px;
+}
+
+.scanner__notice,
+.scanner__hint,
+.scanner__message {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.scanner__message {
+  color: #ffcf6b;
+}
+
+.scanner__capture {
+  position: relative;
+  height: 52px;
+  overflow: hidden;
+  flex: 0 0 auto;
+}
+
+.scanner__capture input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.scanner__manual {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.scanner__manual label {
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.scanner__manual input {
+  height: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  font: inherit;
+  font-size: 15px;
+  padding: 0 12px;
+}
+
+.scanner__manual .button {
+  height: 44px;
+  flex: 0 0 auto;
+}
