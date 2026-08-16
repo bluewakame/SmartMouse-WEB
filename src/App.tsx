@@ -422,8 +422,10 @@ function addressFromLocation(): string | null {
   const fromHash = hash ? addressFromScanResult(decodeURIComponent(hash), location.hostname) : null;
   if (fromHash) return fromHash;
 
+  // ?token=… は Receiver 自身が配信しているページに付く形なので、
+  // 接続先は「このページの配信元」＝ location.host（ポート込み）で組み立てる。
   const token = new URLSearchParams(location.search).get("token");
-  return token ? addressFromScanResult(token, location.hostname) : null;
+  return token ? addressFromScanResult(token, location.host) : null;
 }
 
 /** 対応端末だけ軽く振動させる。iOS Safari は未対応なので黙って無視される。 */

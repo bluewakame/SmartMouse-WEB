@@ -1,4 +1,10 @@
 import { useCallback, useEffect, useRef } from "react";
+import {
+  DOUBLE_TAP_WINDOW_MS,
+  LONG_PRESS_ALLOWED_MOVE_PX,
+  LONG_PRESS_MS,
+  classifyGesture,
+} from "../lib/gesture";
 
 interface TrackpadProps {
   enabled: boolean;
@@ -11,13 +17,6 @@ interface TrackpadProps {
   onDragBegin: () => void;
   onDragEnd: () => void;
 }
-
-/** タップと判定する最大時間・移動量。iOS版の UITapGestureRecognizer に合わせた値。 */
-const TAP_MAX_DURATION_MS = 320;
-const TAP_MAX_MOVE_PX = 12;
-const DOUBLE_TAP_WINDOW_MS = 300;
-const LONG_PRESS_MS = 420;
-const LONG_PRESS_ALLOWED_MOVE_PX = 12;
 
 /**
  * 指の操作をマウス操作に変換する面。iOS版 TrackpadView の移植。
@@ -43,7 +42,9 @@ export function Trackpad({
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const longPressActive = useRef(false);
   const pendingTapTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const lastTapAt = useRef(0);
+  // 0 にすると「読み込んだ瞬間にタップした」扱いになり、
+  // 読み込み直後の最初のタップがダブルタップと誤判定される。
+  const lastTapAt = useRef(Number.NEGATIVE_INFINITY);
 
   const clearLongPressTimer = useCallback(() => {
     if (longPressTimer.current !== null) {
@@ -120,22 +121,27 @@ export function Trackpad({
 
   const finishGesture = () => {
     const { startedAt, maxPointers, travelled } = gesture.current;
-    const duration = performance.now() - startedAt;
-    const isTap = duration < TAP_MAX_DURATION_MS && travelled < TAP_MAX_MOVE_PX;
-    if (!isTap) return;
+    const now = performance.now();
+    const result = classifyGesture({
+      durationMs: now - startedAt,
+      travelled,
+      maxPointers,
+      sinceLastTapMs: now - lastTapAt.current,
+    });
 
-    if (maxPointers >= 2) {
+    if (result === "none") return;
+
+    if (result === "right-click") {
       onRightTap();
       return;
     }
 
-    const now = performance.now();
-    if (now - lastTapAt.current < DOUBLE_TAP_WINDOW_MS) {
+    if (result === "double-tap") {
       if (pendingTapTimer.current !== null) {
         clearTimeout(pendingTapTimer.current);
         pendingTapTimer.current = null;
       }
-      lastTapAt.current = 0;
+      lastTapAt.current = Number.NEGATIVE_INFINITY;
       onDoubleTap();
       return;
     }

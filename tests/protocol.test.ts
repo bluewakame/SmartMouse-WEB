@@ -64,6 +64,15 @@ describe("addressFromScanResult", () => {
   it("補うホストが分からなければ合言葉だけでは接続先を作らない", () => {
     expect(addressFromScanResult(TOKEN, "")).toBeNull();
   });
+
+  it("Receiver 自身が配信しているページでは、そのポートをそのまま使う", () => {
+    expect(addressFromScanResult(TOKEN, "192.168.1.9:8000")).toBe(
+      `ws://192.168.1.9:8000/ws?token=${TOKEN}`,
+    );
+    expect(addressFromScanResult(TOKEN, "192.168.1.9:9000")).toBe(
+      `ws://192.168.1.9:9000/ws?token=${TOKEN}`,
+    );
+  });
 });
 
 describe("表示用の整形", () => {

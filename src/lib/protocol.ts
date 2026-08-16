@@ -98,7 +98,10 @@ export function addressFromScanResult(value: string, fallbackHost?: string): str
 
   if (isValidPairingToken(trimmed)) {
     if (!fallbackHost) return null;
-    return `ws://${fallbackHost}:${DEFAULT_PORT}${DEFAULT_PATH}?token=${trimmed}`;
+    // Receiver 本体がこのページを配信している場合は、そのポート付きのホスト
+    // （location.host）が渡ってくる。ポートが無ければ Receiver の既定値を補う。
+    const host = fallbackHost.includes(":") ? fallbackHost : `${fallbackHost}:${DEFAULT_PORT}`;
+    return `ws://${host}${DEFAULT_PATH}?token=${trimmed}`;
   }
 
   const url = normalizeWebSocketURL(trimmed);
