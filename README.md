@@ -203,3 +203,13 @@ serve.py                    LAN配信用の簡易HTTPサーバー
 4. Windows のファイアウォールで「プライベート ネットワーク」を許可したか
 5. VPN を切って試したか
 6. Receiver を再起動したなら、新しい QR コードを読み直したか
+
+---
+
+## ライセンス
+
+MIT ライセンスです（`LICENSE`）。
+
+このリポジトリのビルド結果は Receiver の `WindowsReceiver/web/` へ入り、
+`SmartMouseReceiver.exe` に同梱されて配布されます。配布物に含まれる依存ライブラリの
+ライセンス表記は、Receiver 側の `generate_notices.py` がビルド時に生成します。
