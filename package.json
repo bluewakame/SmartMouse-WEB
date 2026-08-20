@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "description": "SmartMouse Web — ブラウザから Windows Receiver を操作する緊急用マウス・キーボード",
+  "license": "MIT",
   "scripts": {
     "dev": "vite",
     "dev:lan": "vite --host 0.0.0.0",
